@@ -1,5 +1,8 @@
+from scipy.stats import kurtosis
+import numpy as np
 
-
+def zero_crossings(x):
+    return np.sum(np.diff(np.sign(x)) != 0)
 
 
 def get_gyro_module(window):
@@ -33,6 +36,43 @@ def get_max_acc_module(window):
 def get_min_acc_module(window):
     acc_module = get_acc_module(window)
     return acc_module.min()
+
+def get_acc_module_diff(window):
+    acc_module = get_acc_module(window)
+    acc_module_diff = acc_module.max() - acc_module.min()
+    return acc_module_diff
+
+def get_mean_jerk_acc_module(window):
+    acc_module = get_acc_module(window)
+    jerk = acc_module.diff().dropna()
+    return jerk.mean()
+
+def get_kurtosis_acc_module(window):
+    acc_module = get_acc_module(window)
+    return kurtosis(acc_module)
+
+def get_energy_acc_module(window):
+    acc_module = get_acc_module(window)
+    energy = (acc_module ** 2).sum() / len(acc_module)
+    return energy
+
+def get_zero_crossings_accx(window):
+    acc_x = window['accx'].values
+    return zero_crossings(acc_x)
+
+def get_zero_crossings_accy(window):
+    acc_y = window['accy'].values
+    return zero_crossings(acc_y)
+
+def get_zero_crossings_accz(window):
+    acc_z = window['accz'].values
+    return zero_crossings(acc_z)
+
+def get_total_zero_crossings(window):
+    return (get_zero_crossings_accx(window) +
+            get_zero_crossings_accy(window) +
+            get_zero_crossings_accz(window))
+
 
 ##mean, std, max, min for accz, accy, accx
 
