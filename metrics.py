@@ -1,5 +1,6 @@
 from scipy.stats import kurtosis
 import numpy as np
+import pandas as pd
 
 def zero_crossings(x):
     return np.sum(np.diff(np.sign(x)) != 0)
@@ -43,7 +44,7 @@ def get_acc_module_diff(window):
     return acc_module_diff
 
 def get_mean_jerk_acc_module(window):
-    acc_module = get_acc_module(window)
+    acc_module = pd.Series(get_acc_module(window))
     jerk = acc_module.diff().dropna()
     return jerk.mean()
 

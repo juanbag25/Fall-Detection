@@ -6,10 +6,9 @@ class SlidingWindows:
         self.df = df
         self.window_size = window_size
         self.step_size = step_size
-        self.windows = []
+        self.windows = self.sliding_window()
         self.metrics_functions = metrics_functions
-        
-
+        self.features_df = self.create_features_dataframe()
 
     def sliding_window(self):
         self.windows = []
@@ -28,18 +27,17 @@ class SlidingWindows:
                 metric_name = func.__name__
                 metric_value = func(window)
                 window_metrics[metric_name] = metric_value
-            window_label = window['label'].mode()[0]
-            window_metrics['label'] = window_label
+            window_label = window['secayo'].mode()[0]
+            window_metrics['secayo'] = window_label
             all_metrics.append(window_metrics)
         return all_metrics
-    
 
-    
+
     def create_features_dataframe (self):
         metrics_list = self.calculate_metrics()
-        features_df = pd.DataFrame(metrics_list)
-        return features_df
-        
+        self.features_df = pd.DataFrame(metrics_list)
+        return self.features_df
+    
 
     
 
