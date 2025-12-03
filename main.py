@@ -13,6 +13,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
 filepath = "exp1.csv"
 df = kagglehub.load_dataset(
   KaggleDatasetAdapter.PANDAS,
@@ -32,7 +37,7 @@ for i in range (1,8):
   )
   dfs.append(df)
 
-train_df, validation_df = adapt.split_validation_train(dfs, test_ratio=0.3)
+train_df, validation_df = adapt.split_validation_train(dfs, test_ratio=0.3,seed=42)
 
 print("Train dataset size:", len(train_df))
 print("Validation dataset size:", len(validation_df))
@@ -53,7 +58,13 @@ train_windows = SlidingWindow.SlidingWindows(
         metrics.get_total_zero_crossings,
         metrics.get_zero_crossings_accx,
         metrics.get_zero_crossings_accy,
-        metrics.get_zero_crossings_accz
+        metrics.get_zero_crossings_accz,
+        metrics.get_mean_gyrox,
+        metrics.get_std_gyrox,
+        metrics.get_mean_gyroy,
+        metrics.get_std_gyroy,
+        metrics.get_mean_gyroz,
+        metrics.get_std_gyroz
     ]
 )
 
@@ -77,7 +88,13 @@ validation_windows = SlidingWindow.SlidingWindows(
         metrics.get_total_zero_crossings,
         metrics.get_zero_crossings_accx,
         metrics.get_zero_crossings_accy,
-        metrics.get_zero_crossings_accz
+        metrics.get_zero_crossings_accz,
+        metrics.get_mean_gyrox,
+        metrics.get_std_gyrox,
+        metrics.get_mean_gyroy,
+        metrics.get_std_gyroy,
+        metrics.get_mean_gyroz,
+        metrics.get_std_gyroz
     ]
 )
 
@@ -115,24 +132,31 @@ features3=features2.drop(columns=['get_total_zero_crossings'])
 scaled_features3=scaler.fit_transform(features3)
 df_scaled3 = pd.DataFrame(scaled_features3, columns=features3.columns)
 
-#!!!fa.correlation_analysis(df_scaled3)
+fa.correlation_analysis(df_scaled3)
 
 # Ahora no hay correlaciones altas entre las variables
 
-#!!!fa.pca_analysis(df_scaled3)
+fa.pca_analysis(df_scaled3)
 
 ##Pasamos a los modelos
 
 
 X_train = df_scaled3
 Y_train = train_windows.features_df['secayo']
-X_validation = validation_windows.features_df.drop(columns=['secayo','get_total_zero_crossings','get_acc_module_diff','get_max_acc_module','get_energy_acc_module'])
+
+
+validation_features=validation_windows.features_df.drop(columns=['secayo','get_total_zero_crossings','get_acc_module_diff','get_max_acc_module','get_energy_acc_module'])
+scaled_validation_features=scaler.transform(validation_features)
+df_validation_scaled = pd.DataFrame(scaled_validation_features, columns=validation_features.columns)
+X_validation = df_validation_scaled
 Y_validation = validation_windows.features_df['secayo']
 
+fa.plot_pca_train_clusters(X_train, Y_train)
+fa.plot_pca_validation_over_train_clusters(X_train, Y_train, X_validation, Y_validation)
 
-rf_classifier = RandomForestClassifier(n_estimators=100,bootstrap=True, random_state=42,max_depth=15,min_samples_split=5,min_samples_leaf=2,max_features='sqrt')
+rf_classifier = RandomForestClassifier(n_estimators=500,criterion='gini',bootstrap=False, random_state=42,max_depth=20,min_samples_split=5,min_samples_leaf=2,)
 rf_classifier.fit(X_train, Y_train)
 Y_pred = rf_classifier.predict(X_validation)
 
 print(classification_report(Y_validation, Y_pred))
-print(confusion_matrix(Y_validation, Y_pred))
+print(confusion_matrix(Y_validation, Y_pred)) 

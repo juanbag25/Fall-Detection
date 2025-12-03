@@ -125,3 +125,24 @@ def get_min_accx(window):
     values = window['accx'].values
     return values.min()
 
+def get_mean_gyrox(window):  
+    values = window['gyrox'].values
+    return values.mean()
+def get_std_gyrox(window):
+    values = window['gyrox'].values
+    return values.std()
+
+def get_mean_gyroy(window):  
+    values = window['gyroy'].values
+    return values.mean()
+def get_std_gyroy(window):
+    values = window['gyroy'].values
+    return values.std()
+
+def get_mean_gyroz(window):  
+    values = window['gyroz'].values
+    return values.mean()
+
+def get_std_gyroz(window):
+    values = window['gyroz'].values
+    return values.std()

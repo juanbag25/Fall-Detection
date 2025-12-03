@@ -53,3 +53,48 @@ def pca_analysis(df,n_components = 2):
     plt.ylabel('Principal Component 2')
     plt.grid(True)
     plt.show()
+
+def plot_pca_train_clusters(X_train, Y_train):
+
+    pca=PCA(n_components=2)
+    X_train_pca=pca.fit_transform(X_train)
+    Y_train_pca=Y_train
+
+    pca_df = pd.DataFrame(data=X_train_pca, columns=['PC1', 'PC2'])
+    pca_df['Label'] = Y_train_pca.values
+
+    plt.figure(figsize=(8,6))
+    sns.scatterplot(data=pca_df, x='PC1', y='PC2', hue='Label', palette='Set2', s=60)
+    plt.title('Visualización PCA en 2D')
+    plt.xlabel('Componente Principal 1')
+    plt.ylabel('Componente Principal 2')
+    plt.legend(title='Clase')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+def plot_pca_validation_over_train_clusters(X_train, Y_train, X_validation, Y_validation):
+
+    pca=PCA(n_components=2)
+    X_train_pca=pca.fit_transform(X_train)
+    Y_train_pca=Y_train
+
+    X_validation_pca=pca.transform(X_validation)
+    Y_validation_pca=Y_validation
+
+    pca_train_df = pd.DataFrame(data=X_train_pca, columns=['PC1', 'PC2'])
+    pca_train_df['Label_train'] = Y_train_pca.values
+
+    pca_validation_df = pd.DataFrame(data=X_validation_pca, columns=['PC1', 'PC2'])
+    pca_validation_df['Label_validation'] = Y_validation_pca.values
+
+    plt.figure(figsize=(8,6))
+    sns.scatterplot(data=pca_train_df, x='PC1', y='PC2', hue='Label_train', palette='Set2', s=60, alpha=0.5)
+    sns.scatterplot(data=pca_validation_df, x='PC1', y='PC2', hue='Label_validation', palette='Set1', s=100, marker='X')
+    plt.title('Visualización PCA en 2D: Train vs Validation')
+    plt.xlabel('Componente Principal 1')
+    plt.ylabel('Componente Principal 2')
+    plt.legend(title='Clase')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
